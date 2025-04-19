@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Lab File Transfer</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css', v='1.1') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
 </head>
 <body>
@@ -63,10 +63,21 @@
 
     <!-- Right Panel -->
     <div class="right-panel">
-      <h2 class="files-title">Available Files</h2>
+      <div class="files-header">
+        <h2 class="files-title">Available Files</h2>
+        <div class="file-actions-header">
+          <button id="selectAllBtn" class="select-button">Select All</button>
+          <button id="deselectAllBtn" class="select-button" style="display: none;">Deselect All</button>
+          <button id="deleteSelectedBtn" class="delete-selected-button" disabled>Delete Selected</button>
+        </div>
+      </div>
+      
       <ul class="files-list">
         {% for file in files %}
           <li class="file-item">
+            <div class="file-select">
+              <input type="checkbox" class="file-checkbox" data-file-id="{{ file.id }}" data-file-name="{{ file.name }}">
+            </div>
             <span class="file-name">{{ file.name }}</span>
             <div class="file-actions">
               <a href="/download/{{ file.id }}/{{ file.name }}" class="download-link">Download</a>
@@ -83,6 +94,7 @@
   </div>
 
   <script>
+    // File upload handling
     const fileInput = document.getElementById("fileInput");
     const fileLabel = document.getElementById("fileLabel");
     const form = document.getElementById("uploadForm");
@@ -146,6 +158,94 @@
       } catch (error) {
         console.error("Error:", error);
         statusMessage.textContent = `Error uploading files: ${error.message}`;
+        statusMessage.className = "status-message error";
+      }
+    });
+
+    // Multiple file selection and deletion
+    const selectAllBtn = document.getElementById('selectAllBtn');
+    const deselectAllBtn = document.getElementById('deselectAllBtn');
+    const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
+    const fileCheckboxes = document.querySelectorAll('.file-checkbox');
+
+    // Update delete button state based on checkbox selection
+    function updateDeleteButtonState() {
+      const checkedBoxes = document.querySelectorAll('.file-checkbox:checked');
+      deleteSelectedBtn.disabled = checkedBoxes.length === 0;
+      
+      // Show/hide select all or deselect all button
+      if (checkedBoxes.length === fileCheckboxes.length && fileCheckboxes.length > 0) {
+        selectAllBtn.style.display = 'none';
+        deselectAllBtn.style.display = 'inline-block';
+      } else {
+        selectAllBtn.style.display = 'inline-block';
+        deselectAllBtn.style.display = 'none';
+      }
+    }
+
+    // Add event listeners to checkboxes
+    fileCheckboxes.forEach(checkbox => {
+      checkbox.addEventListener('change', updateDeleteButtonState);
+    });
+
+    // Select All button
+    selectAllBtn.addEventListener('click', () => {
+      fileCheckboxes.forEach(checkbox => {
+        checkbox.checked = true;
+      });
+      updateDeleteButtonState();
+    });
+
+    // Deselect All button
+    deselectAllBtn.addEventListener('click', () => {
+      fileCheckboxes.forEach(checkbox => {
+        checkbox.checked = false;
+      });
+      updateDeleteButtonState();
+    });
+
+    // Delete Selected button
+    deleteSelectedBtn.addEventListener('click', async () => {
+      const checkedBoxes = document.querySelectorAll('.file-checkbox:checked');
+      if (checkedBoxes.length === 0) return;
+      
+      const fileIds = Array.from(checkedBoxes).map(checkbox => checkbox.dataset.fileId);
+      const fileNames = Array.from(checkedBoxes).map(checkbox => checkbox.dataset.fileName);
+      
+      if (!confirm(`Are you sure you want to delete ${fileIds.length} file(s)?\n${fileNames.join('\n')}`)) {
+        return;
+      }
+      
+      statusMessage.textContent = "Deleting files...";
+      statusMessage.className = "status-message uploading";
+      statusMessage.style.display = "block";
+      
+      try {
+        const response = await fetch('/delete-multiple', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ file_ids: fileIds }),
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          statusMessage.textContent = `${result.deleted_count} file(s) deleted successfully`;
+          statusMessage.className = "status-message success";
+          
+          // Reload the page after a short delay
+          setTimeout(() => {
+            window.location.reload();
+          }, 2000);
+        } else {
+          statusMessage.textContent = result.error || "Deletion failed";
+          statusMessage.className = "status-message error";
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        statusMessage.textContent = `Error deleting files: ${error.message}`;
         statusMessage.className = "status-message error";
       }
     });

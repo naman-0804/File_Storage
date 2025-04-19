@@ -113,6 +113,39 @@ def upload_file():
         })
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
+@app.route('/delete-multiple', methods=['POST'])
+def delete_multiple():
+    try:
+        file_ids = request.json.get('file_ids', [])
+        if not file_ids:
+            return jsonify({'success': False, 'error': 'No files selected'}), 400
+        
+        deleted_count = 0
+        errors = []
+        
+        for file_id in file_ids:
+            try:
+                delete_file(file_id)
+                deleted_count += 1
+            except Exception as e:
+                errors.append(f"Error deleting file {file_id}: {str(e)}")
+        
+        if errors:
+            if deleted_count > 0:
+                flash(f'Deleted {deleted_count} files. Errors: {"; ".join(errors)}', 'warning')
+            else:
+                flash(f'Failed to delete files: {"; ".join(errors)}', 'error')
+        else:
+            message = 'File deleted successfully' if deleted_count == 1 else f'{deleted_count} files deleted successfully'
+            flash(message, 'success')
+            
+        return jsonify({
+            'success': True,
+            'deleted_count': deleted_count,
+            'errors': errors
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/download/<file_id>/<file_name>')
 def download(file_id, file_name):

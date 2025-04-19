@@ -346,4 +346,96 @@ body {
   .delete-button:hover {
     background-color: #c0392b;
   }
-    
+/* File selection and multiple delete styles */
+.files-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.file-actions-header {
+  display: flex;
+  gap: 10px;
+}
+
+.select-button {
+  padding: 8px 12px;
+  background-color: rgba(187, 134, 252, 0.1);
+  color: #bb86fc;
+  border: 1px solid rgba(187, 134, 252, 0.3);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: background-color 0.3s ease;
+}
+
+.select-button:hover {
+  background-color: rgba(187, 134, 252, 0.2);
+}
+
+.delete-selected-button {
+  padding: 8px 12px;
+  background-color: rgba(207, 102, 121, 0.1);
+  color: #cf6679;
+  border: 1px solid rgba(207, 102, 121, 0.3);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: background-color 0.3s ease;
+}
+
+.delete-selected-button:hover:not(:disabled) {
+  background-color: rgba(207, 102, 121, 0.2);
+}
+
+.delete-selected-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.file-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  border-bottom: 1px solid #333;
+}
+
+.file-select {
+  margin-right: 10px;
+}
+
+.file-checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: #bb86fc;
+  cursor: pointer;
+}
+
+.file-name {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 15px;
+}
+
+.file-actions {
+  display: flex;
+  gap: 10px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .files-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .file-actions-header {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
