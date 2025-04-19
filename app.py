@@ -31,7 +31,6 @@ creds = service_account.Credentials.from_service_account_file(
     SERVICE_ACCOUNT_FILE, scopes=SCOPES)
 
 drive_service = build('drive', 'v3', credentials=creds)
-
 def upload_to_drive(file_path, file_name):
     file_metadata = {
         'name': file_name,
@@ -43,7 +42,7 @@ def upload_to_drive(file_path, file_name):
         media_body=media,
         fields='id'
     ).execute()
-
+    return file.get('id')  # Return the file ID
 
 def delete_file(file_id):
     drive_service.files().delete(fileId=file_id).execute()
@@ -82,34 +81,38 @@ def index():
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
-    if 'file' not in request.files:
-        flash('No file part', 'error')
-        return redirect(url_for('index'))
-    
-    # Get all files instead of just one
-    files = request.files.getlist('file')
-    
-    if not files or files[0].filename == '':
-        flash('No selected file', 'error')
-        return redirect(url_for('index'))
-    
-    uploaded_count = 0
-    os.makedirs('uploads', exist_ok=True)
-    
-    for file in files:
-        if file and file.filename != '':
-            filepath = os.path.join('uploads', file.filename)
-            file.save(filepath)
-            file_id = upload_to_drive(filepath, file.filename)
-            os.remove(filepath)
-            uploaded_count += 1
-    
-    if uploaded_count == 1:
-        flash('File uploaded successfully', 'success')
-    else:
-        flash(f'{uploaded_count} files uploaded successfully', 'success')
-    
-    return redirect(url_for('index'))
+    try:
+        if 'file' not in request.files:
+            return jsonify({'success': False, 'error': 'No file part'}), 400
+        
+        # Get all files instead of just one
+        files = request.files.getlist('file')
+        
+        if not files or files[0].filename == '':
+            return jsonify({'success': False, 'error': 'No selected file'}), 400
+        
+        uploaded_count = 0
+        os.makedirs('uploads', exist_ok=True)
+        
+        file_ids = []
+        for file in files:
+            if file and file.filename != '':
+                filepath = os.path.join('uploads', file.filename)
+                file.save(filepath)
+                file_id = upload_to_drive(filepath, file.filename)
+                file_ids.append(file_id)
+                os.remove(filepath)
+                uploaded_count += 1
+        
+        message = 'File uploaded successfully' if uploaded_count == 1 else f'{uploaded_count} files uploaded successfully'
+        return jsonify({
+            'success': True, 
+            'message': message,
+            'count': uploaded_count,
+            'file_ids': file_ids
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/download/<file_id>/<file_name>')
 def download(file_id, file_name):
