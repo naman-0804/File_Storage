@@ -55,12 +55,24 @@
 
     <!-- Right Panel -->
     <div class="right-panel">
-      <h2 class="files-title">Available Files</h2>
-      <ul class="files-list">
-        <li class="no-files">No files found.</li>
-      </ul>
-    </div>
-  </div>
+        <h2 class="files-title">Available Files</h2>
+        <ul class="files-list">
+          {% for file in files %}
+            <li class="file-item">
+              <span class="file-name">{{ file.name }}</span>
+              <div class="file-actions">
+                <a href="/download/{{ file.id }}/{{ file.name }}" class="download-link">Download</a>
+                <form action="/delete/{{ file.id }}" method="post" class="delete-form" onsubmit="return confirm('Are you sure you want to delete this file?');">
+                  <button type="submit" class="delete-button">Delete</button>
+                </form>
+              </div>
+            </li>
+          {% else %}
+            <li class="no-files">No files found.</li>
+          {% endfor %}
+        </ul>
+      </div>
+      
 
   <script>
     const fileInput = document.getElementById("fileInput");
