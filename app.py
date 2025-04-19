@@ -43,7 +43,7 @@ def upload_to_drive(file_path, file_name):
         media_body=media,
         fields='id'
     ).execute()
-    return file.get('id')
+
 
 def delete_file(file_id):
     drive_service.files().delete(fileId=file_id).execute()
