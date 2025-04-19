@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Lab File Transfer</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="container">
+    <div class="left-panel">
+      <h1 class="title">Lab File Transfer</h1>
+      <div class="info-section">
+        <h2 class="info-title">No Login Required</h2>
+        <p class="info-description">
+          Transfer lab assignments from lab computers to your personal device without logging into Gmail or cloud services.
+        </p>
+        
+        <div class="benefit-box">
+          <div class="icon-container">
+            <span class="lock-icon">🔒</span>
+          </div>
+          <div class="benefit-content">
+            <h3 class="benefit-heading">Enhanced Privacy:</h3>
+            <ul class="benefit-list">
+              <li>No need to log into personal accounts on shared lab computers</li>
+              <li>Prevent unauthorized access to your accounts</li>
+              <li>Maintain privacy while using public computers</li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="benefit-box">
+          <div class="icon-container">
+            <span class="lightning-icon">⚡</span>
+          </div>
+          <div class="benefit-content">
+            <h3 class="benefit-heading">Quick Transfer:</h3>
+            <ul class="benefit-list">
+              <li>Instantly upload files from lab computers</li>
+              <li>Download to your personal device with a single click</li>
+              <li>No complicated setup or account verification</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <form action="/upload" method="post" enctype="multipart/form-data" class="upload-form">
+        <!-- The label will dynamically change when files are selected -->
+        <label for="fileInput" class="custom-file-upload" id="fileLabel">Choose Files</label>
+        <input type="file" id="fileInput" name="file" required multiple style="display: none;" />
+        <input type="submit" value="Upload" class="submit-button">
+      </form>
+    </div>
+
+    <div class="right-panel">
+      <h2 class="files-title">Available Files</h2>
+      <ul class="files-list">
+        {% for file in files %}
+          <li class="file-item">
+            <span class="file-name">{{ file.name }}</span>
+            <a href="/download/{{ file.id }}/{{ file.name }}" class="download-link">Download</a>
+            <form action="/delete/{{ file.id }}" method="post" class="delete-form" onsubmit="return confirm('Are you sure you want to delete this file?');">
+              <button type="submit" class="delete-button">Delete</button>
+            </form>
+          </li>
+        {% else %}
+          <li class="no-files">No files found.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  <!-- Script to update file count on the button -->
+  <script>
+    const fileInput = document.getElementById("fileInput");
+    const fileLabel = document.getElementById("fileLabel");
+
+    fileInput.addEventListener("change", () => {
+      const count = fileInput.files.length;
+      fileLabel.textContent = count === 0 ? "Choose Files" : `${count} File${count > 1 ? 's' : ''} Selected`;
+    });
+  </script>
+</body>
+</html>

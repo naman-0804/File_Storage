@@ -1,0 +1,349 @@
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+/* Base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #121212;
+  color: #e0e0e0;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.container {
+  display: flex;
+  width: 90%;
+  max-width: 1200px;
+  height: 90vh;
+  background-color: #121212;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* Left panel with info */
+.left-panel {
+  flex: 1;
+  padding: 25px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Right panel with files */
+.right-panel {
+  flex: 1;
+  padding: 25px;
+  background-color: #1a1a1a;
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 600;
+  color: #bb86fc;
+  margin-bottom: 20px;
+}
+
+/* Info section styling */
+.info-section {
+  border-left: 4px solid #bb86fc;
+  padding-left: 15px;
+  margin-bottom: 30px;
+}
+
+.info-title {
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: #bb86fc;
+  margin-bottom: 10px;
+}
+
+.info-description {
+  font-size: 1rem;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.benefit-box {
+  background-color: #1e1e1e;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 15px;
+  display: flex;
+}
+
+.icon-container {
+  margin-right: 15px;
+  font-size: 1.5rem;
+}
+
+.lock-icon {
+  color: #bb86fc;
+}
+
+.lightning-icon {
+  color: #ff7b00;
+}
+
+.benefit-content {
+  flex: 1;
+}
+
+.benefit-heading {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #bb86fc;
+  margin-bottom: 10px;
+}
+
+.benefit-list {
+  list-style-type: disc;
+  padding-left: 20px;
+}
+
+.benefit-list li {
+  margin-bottom: 8px;
+  color: #b0b0b0;
+  font-size: 0.95rem;
+}
+
+/* File upload form */
+.upload-form {
+  display: flex;
+  gap: 15px;
+  margin-top: auto;
+}
+
+.custom-file-upload {
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #bb86fc, #9d4edd);
+  color: #000;
+  font-weight: 500;
+  font-size: 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex: 1;
+  text-align: center;
+}
+
+.custom-file-upload:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(187, 134, 252, 0.3);
+}
+
+#fileInput {
+  display: none;
+}
+
+.submit-button {
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #03dac6, #018786);
+  color: #000;
+  font-weight: 500;
+  font-size: 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex: 1;
+}
+
+.submit-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(3, 218, 198, 0.3);
+}
+
+/* Files section */
+.files-title {
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: #bb86fc;
+  margin-bottom: 20px;
+}
+
+.files-list {
+  list-style: none;
+  border-radius: 8px;
+  background-color: #252525;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.file-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  border-bottom: 1px solid #333;
+}
+
+.file-item:hover {
+  background-color: #2d2d2d;
+}
+
+.file-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  padding-right: 15px;
+}
+
+.download-link {
+  color: #bb86fc;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 8px 15px;
+  background-color: rgba(187, 134, 252, 0.1);
+  border-radius: 4px;
+  white-space: nowrap;
+  transition: background-color 0.3s ease;
+}
+
+.download-link:hover {
+  background-color: rgba(187, 134, 252, 0.2);
+}
+
+.download-link::after {
+  content: "⬇️";
+  font-size: 1rem;
+  margin-left: 5px;
+}
+
+.no-files {
+  padding: 20px;
+  text-align: center;
+  color: #888;
+  font-style: italic;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+    height: auto;
+  }
+  
+  .left-panel, .right-panel {
+    padding: 20px;
+  }
+  
+  .files-list {
+    max-height: 300px;
+  }
+  
+  .upload-form {
+    flex-direction: column;
+  }
+}
+/* Add these styles to your existing CSS file */
+
+/* Status message styling */
+.status-message {
+    padding: 10px 15px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    text-align: center;
+    transition: opacity 0.5s ease;
+  }
+  
+  .success {
+    background-color: rgba(3, 218, 198, 0.2);
+    color: #03dac6;
+    border-left: 4px solid #03dac6;
+  }
+  
+  .error {
+    background-color: rgba(207, 102, 121, 0.2);
+    color: #cf6679;
+    border-left: 4px solid #cf6679;
+  }
+  
+  .warning {
+    background-color: rgba(255, 183, 77, 0.2);
+    color: #ffb74d;
+    border-left: 4px solid #ffb74d;
+  }
+  
+  /* Delete button styling */
+  .delete-button {
+    background-color: rgba(207, 102, 121, 0.2);
+    color: #cf6679;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: background-color 0.3s ease;
+  }
+  
+  .delete-button:hover {
+    background-color: rgba(207, 102, 121, 0.4);
+  }
+  
+  .file-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    border-bottom: 1px solid #333;
+  }
+  
+  .file-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+    padding-right: 15px;
+  }
+  
+  .download-link {
+    margin-right: 10px;
+  }
+  
+  /* Responsive adjustments for the file item actions */
+  @media (max-width: 768px) {
+    .file-item {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .file-name {
+      margin-bottom: 10px;
+      width: 100%;
+    }
+    
+    .download-link, .delete-form {
+      margin-top: 5px;
+    }
+  }
+  .delete-form {
+    display: inline;
+    margin-left: 10px;
+  }
+  
+  .delete-button {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    font-size: 0.9rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .delete-button:hover {
+    background-color: #c0392b;
+  }
+    
