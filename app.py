@@ -11,12 +11,25 @@ app.secret_key = 'your_secret_key_here'  # Required for flash messages
 
 # Config
 FOLDER_ID = '1g7K6oqInxwaiZ_LoJ5QSRtKBUCgS5b_3'
-SERVICE_ACCOUNT_FILE = 'credentials.json'
 SCOPES = ['https://www.googleapis.com/auth/drive']
 
-# Auth
+import tempfile
+import json
+
+# Load credentials from environment variable
+creds_json = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS_JSON")
+if not creds_json:
+    raise Exception("GOOGLE_APPLICATION_CREDENTIALS_JSON environment variable is not set")
+
+with tempfile.NamedTemporaryFile(mode='w+', delete=False, suffix='.json') as temp_cred:
+    temp_cred.write(creds_json)
+    temp_cred.flush()
+    SERVICE_ACCOUNT_FILE = temp_cred.name
+
+# Use this temporary file for credentials
 creds = service_account.Credentials.from_service_account_file(
     SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+
 drive_service = build('drive', 'v3', credentials=creds)
 
 def upload_to_drive(file_path, file_name):
