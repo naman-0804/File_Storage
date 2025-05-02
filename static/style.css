@@ -173,39 +173,30 @@ body {
 
 .files-list {
   list-style: none;
-  border-radius: 10px;
-  background-color: #1f1f1f;
+  border-radius: 8px;
+  background-color: #252525;
   overflow-y: auto;
   flex: 1;
-  padding: 10px;
-  border: 1px solid #2a2a2a;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
 }
 
 .file-item {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  padding: 12px 18px;
-  background-color: #292929;
-  border-radius: 6px;
-  margin-bottom: 10px;
-  transition: background-color 0.3s ease;
+  align-items: center;
+  padding: 15px;
+  border-bottom: 1px solid #333;
 }
 
 .file-item:hover {
-  background-color: #333333;
+  background-color: #2d2d2d;
 }
 
 .file-name {
-  flex: 1;
-  font-size: 1rem;
-  font-weight: 500;
-  color: #e0e0e0;
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
-  margin-right: 15px;
+  flex: 1;
+  padding-right: 15px;
 }
 
 .download-link {
