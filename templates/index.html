@@ -1,7 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Lab File Transfer</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+</head>
 <body>
   <template id="pageContent">
     <div class="container">
-      <!-- ======= ORIGINAL CONTENT STARTS HERE ======= -->
       <div class="left-panel">
         <h1 class="title">Lab File Transfer</h1>
         <div class="info-section">
@@ -81,19 +89,11 @@
           {% endfor %}
         </ul>
       </div>
-      <!-- ======= ORIGINAL CONTENT ENDS HERE ======= -->
     </div>
   </template>
 
-  <!-- Optional: if JS is off, hide page -->
-  <noscript>
-    <style>body { display: none; }</style>
-    <h2>Please enable JavaScript to use this site.</h2>
-  </noscript>
-
-  <!-- ======= PIN ENTRY SCRIPT ======= -->
   <script>
-    const correctPin = "110104"; // Change your PIN here
+    const correctPin = "110108"; // 🔐 Change your PIN here
     const verified = sessionStorage.getItem("pin_verified");
 
     if (!verified) {
@@ -101,14 +101,158 @@
       if (entered === correctPin) {
         sessionStorage.setItem("pin_verified", "true");
       } else {
-        document.body.innerHTML = "<h2 style='color:red; text-align:center; margin-top:100px;'>Access Denied</h2>";
+        document.body.innerHTML = "<h2 style='color:red;text-align:center;margin-top:100px;'>Access Denied</h2>";
       }
     }
 
     if (sessionStorage.getItem("pin_verified") === "true") {
-      const template = document.getElementById("pageContent");
-      const content = template.content.cloneNode(true);
+      const content = document.getElementById("pageContent").content.cloneNode(true);
       document.body.appendChild(content);
+
+      // ✅ All your JavaScript logic inside the PIN check
+      const fileInput = document.getElementById("fileInput");
+      const fileLabel = document.getElementById("fileLabel");
+      const form = document.getElementById("uploadForm");
+      const statusMessage = document.getElementById("statusMessage");
+
+      fileInput.addEventListener("change", () => {
+        const count = fileInput.files.length;
+        fileLabel.textContent = count === 0 ? "Choose Files" : `${count} File${count > 1 ? 's' : ''} Selected`;
+      });
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        if (fileInput.files.length === 0) {
+          statusMessage.textContent = "Please select at least one file";
+          statusMessage.className = "status-message error";
+          statusMessage.style.display = "block";
+          return;
+        }
+
+        statusMessage.textContent = "Uploading files...";
+        statusMessage.className = "status-message uploading";
+        statusMessage.style.display = "block";
+
+        try {
+          const formData = new FormData(form);
+          const response = await fetch('/upload', {
+            method: 'POST',
+            body: formData
+          });
+
+          const responseText = await response.text();
+
+          try {
+            const result = JSON.parse(responseText);
+
+            if (result.success) {
+              const fileCount = fileInput.files.length;
+              statusMessage.textContent = result.message || `${fileCount} file${fileCount > 1 ? 's' : ''} uploaded successfully!`;
+              statusMessage.className = "status-message success";
+
+              fileLabel.textContent = "Choose Files";
+              form.reset();
+
+              setTimeout(() => {
+                window.location.reload();
+              }, 2000);
+            } else {
+              statusMessage.textContent = result.error || "Upload failed";
+              statusMessage.className = "status-message error";
+            }
+          } catch (jsonError) {
+            console.error("Failed to parse response as JSON:", responseText.substring(0, 150));
+            statusMessage.textContent = "Server returned invalid response. Try again.";
+            statusMessage.className = "status-message error";
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          statusMessage.textContent = `Error uploading files: ${error.message}`;
+          statusMessage.className = "status-message error";
+        }
+      });
+
+      const selectAllBtn = document.getElementById('selectAllBtn');
+      const deselectAllBtn = document.getElementById('deselectAllBtn');
+      const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
+      const fileCheckboxes = document.querySelectorAll('.file-checkbox');
+
+      function updateDeleteButtonState() {
+        const checkedBoxes = document.querySelectorAll('.file-checkbox:checked');
+        deleteSelectedBtn.disabled = checkedBoxes.length === 0;
+
+        if (checkedBoxes.length === fileCheckboxes.length && fileCheckboxes.length > 0) {
+          selectAllBtn.style.display = 'none';
+          deselectAllBtn.style.display = 'inline-block';
+        } else {
+          selectAllBtn.style.display = 'inline-block';
+          deselectAllBtn.style.display = 'none';
+        }
+      }
+
+      fileCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updateDeleteButtonState);
+      });
+
+      selectAllBtn.addEventListener('click', () => {
+        fileCheckboxes.forEach(checkbox => {
+          checkbox.checked = true;
+        });
+        updateDeleteButtonState();
+      });
+
+      deselectAllBtn.addEventListener('click', () => {
+        fileCheckboxes.forEach(checkbox => {
+          checkbox.checked = false;
+        });
+        updateDeleteButtonState();
+      });
+
+      deleteSelectedBtn.addEventListener('click', async () => {
+        const checkedBoxes = document.querySelectorAll('.file-checkbox:checked');
+        if (checkedBoxes.length === 0) return;
+
+        const fileIds = Array.from(checkedBoxes).map(checkbox => checkbox.dataset.fileId);
+        const fileNames = Array.from(checkedBoxes).map(checkbox => checkbox.dataset.fileName);
+
+        if (!confirm(`Are you sure you want to delete ${fileIds.length} file(s)?\n${fileNames.join('\n')}`)) {
+          return;
+        }
+
+        statusMessage.textContent = "Deleting files...";
+        statusMessage.className = "status-message uploading";
+        statusMessage.style.display = "block";
+
+        try {
+          const response = await fetch('/delete-multiple', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ file_ids: fileIds }),
+          });
+
+          const result = await response.json();
+
+          if (result.success) {
+            statusMessage.textContent = `${result.deleted_count} file(s) deleted successfully`;
+            statusMessage.className = "status-message success";
+
+            setTimeout(() => {
+              window.location.reload();
+            }, 2000);
+          } else {
+            statusMessage.textContent = result.error || "Deletion failed";
+            statusMessage.className = "status-message error";
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          statusMessage.textContent = `Error deleting files: ${error.message}`;
+          statusMessage.className = "status-message error";
+        }
+      });
     }
   </script>
 </body>
+</html>
